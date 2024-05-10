@@ -1,0 +1,15 @@
+.classSelect{
+  color: white;
+  font-size: 40px;
+  font-weight: bold;
+}
+
+.cursor:hover {
+  transform: scale(1.5);
+  cursor: pointer;
+  color: green !important;
+}
+
+.custom-table thead {
+  background-color: black !important;
+}
