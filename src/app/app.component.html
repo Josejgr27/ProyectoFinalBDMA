@@ -1,0 +1,217 @@
+<!-- <div class="row">
+  <div style="background-color: black;" class="col-md text-center">
+    <label style=" color:white">CONTROL DE BECAS - ALUMNOS</label>
+  </div>
+</div> -->
+
+
+<div class="row pb-5">
+  <div class="col-md">
+    <nav class="navbar navbar-expand-lg  bg-dark">
+      <div class="container justify-content-end">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a [class]="navInicio ? 'nav-link classSelect':'nav-link cursor'" style="color:white" href="#"
+                (click)="clickNav('Inicio')">Inicio</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" style="color:white" [class]="navBecas ? 'nav-link classSelect':'nav-link cursor'"
+                href="#" (click)="clickNav('Becas')">Becas</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" style="color:white" [class]="navAlumnos ? 'nav-link classSelect':'nav-link cursor'"
+                href="#" (click)="clickNav('Alumnos')">Alumnos</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" style="color:white" [class]="navMaterias ? 'nav-link classSelect':'nav-link cursor'"
+                href="#" (click)="clickNav('Materias')">Materias</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </div>
+</div>
+
+<div class="row" *ngIf="navInicio">
+  <div class="col-md text-center">
+    <img src="\assets\logoITT.jpg" alt="logoITT">
+  </div>
+</div>
+
+
+<div class="row" *ngIf="navAlumnos">
+  <div class="col-md">
+    <div style="width: 70%; margin: 0 auto;">
+      <table class="table custom-table" style="width: 100%; border-collapse: collapse; border: 1px solid black;">
+        <thead>
+          <tr>
+            <th><i class="fa fa-plus cursor" aria-hidden="true"></i></th>
+            <th>NOMBRE</th>
+            <th>APELLIDO</th>
+            <th>NO. CONTROL</th>
+            <th>SEMESTRE</th>
+            <th>MODALIDAD</th>
+            <th>BECA</th>
+            <th style="width: 10%"></th>
+          </tr>
+        </thead>
+        <tbody style="background-color: white;">
+          <tr *ngFor="let item of lEstudiantes; let i = index">
+            <td>{{i+1}}</td>
+            <td>{{item.nombre}}</td>
+            <td>{{item.apellidos}}</td>
+            <td>{{item.noControl}}</td>
+            <td>{{item.semestre}}</td>
+            <td>{{item.modalidad}}</td>
+            <td>NO</td>
+            <td>
+              <em class="fa fa-book cursor pr-1 fa-lg" ngbTooltip="Ver calificaciones"
+                (click)="clickVerCalificaciones()"></em>
+              <em class="fa fa-money cursor pr-1 fa-lg" ngbTooltip="Ver becas" (click)="clickVerBecas()"></em>
+              <em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar" (click)="true"></em>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="row" *ngIf="navBecas">
+  <div class="col-md">
+    <div style="width: 70%; margin: 0 auto;">
+      <table class="table" style="width: 100%; border-collapse: collapse; border: 1px solid black;">
+        <thead style="background-color: #cfcfcf;">
+          <tr>
+            <th><i class="fa fa-plus cursor" aria-hidden="true"></i></th>
+            <th>NOMBRE</th>
+            <th>MONTO</th>
+            <th>DURACION</th>
+            <th style="width: 10%"></th>
+          </tr>
+        </thead>
+        <tbody style="background-color: white;">
+          <tr *ngFor="let item of lBecas; let i = index">
+            <td>{{i+1}}</td>
+            <td>{{item.tipo}}</td>
+            <td>{{item.monto}}</td>
+            <td>{{item.duracion}}</td>
+            <td><em class="fa fa-eye cursor pr-1 fa-lg" ngbTooltip="Ver requisitos" (click)="clickVerRequisitos()"></em>
+              <em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar" (click)="true"></em>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="row" *ngIf="navMaterias">
+  <div class="col-md">
+    <div style="width: 70%; margin: 0 auto;">
+      <table class="table" style="width: 100%; border-collapse: collapse; border: 1px solid black;">
+        <thead style="background-color: #cfcfcf;">
+          <tr>
+            <th><i class="fa fa-plus cursor" aria-hidden="true"></i></th>
+            <th>MATERIA</th>
+            <th>DOCENTE</th>
+            <th>SEMESTRE</th>
+            <th style="width: 10%"></th>
+          </tr>
+        </thead>
+        <tbody style="background-color: white;">
+          <tr *ngFor="let item of lMaterias; let i = index">
+            <td>{{i+1}}</td>
+            <td>{{item.nombre}}</td>
+            <td>{{item.responsable}}</td>
+            <td>{{item.semestre}}</td>
+            <td><em class="fa fa-eye cursor pr-1 fa-lg" ngbTooltip="Ver alumnos" (click)="clickVerAlumnos()"></em>
+              <em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar" (click)="true"></em>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL PARA VER RQEUISITOS -->
+<div id="modalReq" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">REQUISITOS</h4>
+        <button style="background-color: red;" type="button" class="btn-close" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+
+      </div>
+      <div class="modal-body">
+        <div class="card" id="cardiframe">
+          <iframe name="PreviewEI" style="height:85vh;max-width: 100%;" title="iFrame PREVIEW"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL PARA VER aLUMN -->
+<div id="modalAlum" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">ALUMNOS</h4>
+        <button style="background-color: red;" type="button" class="btn-close" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+
+      </div>
+      <div class="modal-body">
+        <div class="card" id="cardiframe">
+          <iframe name="PreviewEI" style="height:85vh;max-width: 100%;" title="iFrame PREVIEW"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL PARA VER CALIFICACIONES -->
+<div id="modalCalif" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">CALIFICACIONES</h4>
+        <button style="background-color: red;" type="button" class="btn-close" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+
+      </div>
+      <div class="modal-body">
+        <div class="card" id="cardiframe">
+          <iframe name="PreviewEI" style="height:85vh;max-width: 100%;" title="iFrame PREVIEW"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL PARA VER BECAS -->
+<div id="modalBecas" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">BECAS</h4>
+        <button style="background-color: red;" type="button" class="btn-close" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+
+      </div>
+      <div class="modal-body">
+        <div class="card" id="cardiframe">
+          <iframe name="PreviewEI" style="height:85vh;max-width: 100%;" title="iFrame PREVIEW"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
