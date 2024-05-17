@@ -27,6 +27,11 @@
               <a class="nav-link" style="color:white" [class]="navMaterias ? 'nav-link classSelect':'nav-link cursor'"
                 href="#" (click)="clickNav('Materias')">Materias</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" style="color:white"
+                [class]="navRequisitosP ? 'nav-link classSelect':'nav-link cursor'" href="#"
+                (click)="clickNav('RequisitosP')">Requisitos</a>
+            </li>
           </ul>
         </div>
       </div>
@@ -47,7 +52,7 @@
       <table class="table custom-table" style="width: 100%; border-collapse: collapse; border: 1px solid black;">
         <thead>
           <tr>
-            <th><i class="fa fa-plus cursor" aria-hidden="true"></i></th>
+            <th><i class="fa fa-plus cursor" aria-hidden="true" (click)="addAlummno()"></i></th>
             <th>NOMBRE</th>
             <th>APELLIDO</th>
             <th>NO. CONTROL</th>
@@ -59,18 +64,19 @@
         </thead>
         <tbody style="background-color: white;">
           <tr *ngFor="let item of lEstudiantes; let i = index">
-            <td>{{i+1}}</td>
+            <td><i class="fa fa-trash-o" aria-hidden="true" style="color:red"
+                (click)="DeleteAlumno(item.id)"></i>{{i+1}}</td>
             <td>{{item.nombre}}</td>
             <td>{{item.apellidos}}</td>
             <td>{{item.noControl}}</td>
             <td>{{item.semestre}}</td>
             <td>{{item.modalidad}}</td>
-            <td>NO</td>
+            <td>{{item?.boolBeca || 'NO'}}</td>
             <td>
               <em class="fa fa-book cursor pr-1 fa-lg" ngbTooltip="Ver calificaciones"
-                (click)="clickVerCalificaciones()"></em>
-              <em class="fa fa-money cursor pr-1 fa-lg" ngbTooltip="Ver becas" (click)="clickVerBecas()"></em>
-              <em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar" (click)="true"></em>
+                (click)="clickVerCalificaciones(item.id,'')"></em>
+              <em class="fa fa-money cursor pr-1 fa-lg" ngbTooltip="Ver becas" (click)="clickVerBecas(item.id,'')"></em>
+              <em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar" (click)="editAlummno(item)"></em>
             </td>
           </tr>
         </tbody>
@@ -85,7 +91,7 @@
       <table class="table" style="width: 100%; border-collapse: collapse; border: 1px solid black;">
         <thead style="background-color: #cfcfcf;">
           <tr>
-            <th><i class="fa fa-plus cursor" aria-hidden="true"></i></th>
+            <th><i class="fa fa-plus cursor" aria-hidden="true" (click)="addBeca()"></i></th>
             <th>NOMBRE</th>
             <th>MONTO</th>
             <th>DURACION</th>
@@ -94,12 +100,14 @@
         </thead>
         <tbody style="background-color: white;">
           <tr *ngFor="let item of lBecas; let i = index">
-            <td>{{i+1}}</td>
+            <td><i class="fa fa-trash-o" aria-hidden="true" style="color:red" (click)="DeleteBeca(item)"></i>{{i+1}}
+            </td>
             <td>{{item.tipo}}</td>
             <td>{{item.monto}}</td>
             <td>{{item.duracion}}</td>
-            <td><em class="fa fa-eye cursor pr-1 fa-lg" ngbTooltip="Ver requisitos" (click)="clickVerRequisitos()"></em>
-              <em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar" (click)="true"></em>
+            <td><em class="fa fa-eye cursor pr-1 fa-lg" ngbTooltip="Ver requisitos"
+                (click)="clickVerRequisitosP(item.id)"></em>
+              <em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar" (click)="editBeca(item)"></em>
             </td>
           </tr>
         </tbody>
@@ -114,7 +122,7 @@
       <table class="table" style="width: 100%; border-collapse: collapse; border: 1px solid black;">
         <thead style="background-color: #cfcfcf;">
           <tr>
-            <th><i class="fa fa-plus cursor" aria-hidden="true"></i></th>
+            <th><i class="fa fa-plus cursor" aria-hidden="true" (click)="addMateria()"></i></th>
             <th>MATERIA</th>
             <th>DOCENTE</th>
             <th>SEMESTRE</th>
@@ -123,12 +131,42 @@
         </thead>
         <tbody style="background-color: white;">
           <tr *ngFor="let item of lMaterias; let i = index">
-            <td>{{i+1}}</td>
+            <td><i class="fa fa-trash-o" aria-hidden="true" style="color:red" (click)="DeleteMateria(item)"></i>{{i+1}}
+            </td>
             <td>{{item.nombre}}</td>
             <td>{{item.responsable}}</td>
             <td>{{item.semestre}}</td>
-            <td><em class="fa fa-eye cursor pr-1 fa-lg" ngbTooltip="Ver alumnos" (click)="clickVerAlumnos()"></em>
-              <em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar" (click)="true"></em>
+            <td><em class="fa fa-eye cursor pr-1 fa-lg" ngbTooltip="Ver alumnos"
+                (click)="clickVerAlumnos('',item.id)"></em>
+              <em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar" (click)="editMateria(item)"></em>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="row" *ngIf="navRequisitosP">
+  <div class="col-md">
+    <div style="width: 70%; margin: 0 auto;">
+      <table class="table" style="width: 100%; border-collapse: collapse; border: 1px solid black;">
+        <thead style="background-color: #cfcfcf;">
+          <tr>
+            <th><i class="fa fa-plus cursor" aria-hidden="true" (click)="addReqP()"></i></th>
+            <th>REQUISITO</th>
+            <th>DESCRIPCIÓN</th>
+            <th>FECHA REVISIÓN</th>
+            <th style="width: 5%"></th>
+          </tr>
+        </thead>
+        <tbody style="background-color: white;">
+          <tr *ngFor="let item of lRequisitosP; let i = index">
+            <td><i class="fa fa-trash-o" aria-hidden="true" style="color:red" (click)="deleteReqP(item)"></i>{{i+1}}
+            </td>
+            <td>{{item.requisito}}</td>
+            <td>{{item.descripcion}}</td>
+            <td>{{item.fecha_revision | date:'dd-MM-yyyy' }}</td>
+            <td><em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar" (click)="editReqP(item)"></em></td>
           </tr>
         </tbody>
       </table>
@@ -139,7 +177,7 @@
 
 <!-- MODAL PARA VER RQEUISITOS -->
 <div id="modalReq" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-md">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">REQUISITOS</h4>
@@ -149,7 +187,35 @@
       </div>
       <div class="modal-body">
         <div class="card" id="cardiframe">
-          <iframe name="PreviewEI" style="height:85vh;max-width: 100%;" title="iFrame PREVIEW"></iframe>
+          <div class="row">
+            <div class="col-md">
+              <table class="table">
+                <thead style="background-color: #cfcfcf !important;">
+                  <tr>
+                    <th style="width: 50px;">#</th>
+                    <th>Requisito</th>
+                    <th>Descripción</th>
+                    <th>Puntaje Necesario</th>
+                    <th>Fecha Actualización</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of lRequisitos; let i = index">
+                    <td><i class="fa fa-trash-o" aria-hidden="true" style="color:red"></i>{{i+1}}</td>
+                    <td>{{item?.requisito?.requisito}}</td>
+                    <td>{{item?.requisito?.descripcion}}</td>
+                    <td>{{item.puntaje}}</td>
+                    <td>{{item.updated_at | date:'dd-MM-yyyy'}}</td>
+                    <td> <em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar"
+                        (click)="clickVerReqBec(item.id)"></em>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!--   <iframe name="PreviewEI" style="height:85vh;max-width: 100%;" title="iFrame PREVIEW"></iframe> -->
         </div>
       </div>
     </div>
@@ -159,7 +225,7 @@
 
 <!-- MODAL PARA VER aLUMN -->
 <div id="modalAlum" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-md">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">ALUMNOS</h4>
@@ -169,7 +235,35 @@
       </div>
       <div class="modal-body">
         <div class="card" id="cardiframe">
-          <iframe name="PreviewEI" style="height:85vh;max-width: 100%;" title="iFrame PREVIEW"></iframe>
+          <div class="row">
+            <div class="col-md">
+              <table class="table">
+                <thead style="background-color: #cfcfcf !important;">
+                  <tr>
+                    <th style="width: 50px;">#</th>
+                    <th>No. Control</th>
+                    <th>Nombre</th>
+                    <th>Apellidos</th>
+                    <th>Modalidad</th>
+                    <th>Calificación</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of lCalificaciones; let i = index">
+                    <td><i class="fa fa-trash-o" aria-hidden="true" style="color:red"></i>{{i+1}}</td>
+                    <td>{{item?.estudiante?.noControl}}</td>
+                    <td>{{item?.estudiante?.nombre}}</td>
+                    <td>{{item?.estudiante?.apellidos|| '-'}}</td>
+                    <td>{{item?.estudiante?.modalidad}}</td>
+                    <td>{{item?.calificacion || '-'}}</td>
+                    <td> <em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar" (click)="true"></em>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -179,7 +273,7 @@
 
 <!-- MODAL PARA VER CALIFICACIONES -->
 <div id="modalCalif" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-md">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">CALIFICACIONES</h4>
@@ -189,7 +283,34 @@
       </div>
       <div class="modal-body">
         <div class="card" id="cardiframe">
-          <iframe name="PreviewEI" style="height:85vh;max-width: 100%;" title="iFrame PREVIEW"></iframe>
+          <div class="row">
+            <div class="col-md">
+              <table class="table">
+                <thead style="background-color: #cfcfcf !important;">
+                  <tr>
+                    <th style="width: 50px;">#</th>
+                    <th>Materia</th>
+                    <th>Docente</th>
+                    <th>Calificación</th>
+                    <th>Modalidad</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of lCalificaciones; let i = index">
+                    <td><i class="fa fa-trash-o" aria-hidden="true" style="color:red"></i>{{i+1}}</td>
+                    <td>{{item?.materia?.nombre}}</td>
+                    <td>{{item?.materia?.responsable}}</td>
+                    <td>{{item.calificacion || '-'}}</td>
+                    <td>{{item?.estudiante?.modalidad}}</td>
+                    <td> <em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar" (click)="true"></em>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- <iframe name="PreviewEI" style="height:85vh;max-width: 100%;" title="iFrame PREVIEW"></iframe> -->
         </div>
       </div>
     </div>
@@ -199,17 +320,299 @@
 
 <!-- MODAL PARA VER BECAS -->
 <div id="modalBecas" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-md">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">BECAS2</h4>
+        <h4 class="modal-title">BECAS</h4>
         <button style="background-color: red;" type="button" class="btn-close" data-bs-dismiss="modal"
           aria-label="Close"></button>
 
       </div>
       <div class="modal-body">
         <div class="card" id="cardiframe">
-          <iframe name="PreviewEI" style="height:85vh;max-width: 100%;" title="iFrame PREVIEW"></iframe>
+          <div class="row">
+            <div class="col-md">
+              <table class="table">
+                <thead style="background-color: #cfcfcf !important;">
+                  <tr>
+                    <th style="width: 50px;;">#</th>
+                    <th>Tipo</th>
+                    <th>Monto</th>
+                    <th>Duración</th>
+                    <th>Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of lBecasEst; let i = index">
+                    <td><i class="fa fa-trash-o" aria-hidden="true" style="color:red"></i>{{i+1}}</td>
+                    <td>{{item?.beca?.tipo || ''}}</td>
+                    <td>{{item?.beca?.monto || ''}}</td>
+                    <td>{{item?.beca?.duracion || '-'}}</td>
+                    <td>{{item.status==1?'ACTIVA':'INACTIVA'}}</td>
+                    <td> <em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar" (click)="true"></em>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- MODAL PARA EDITAR BECAS -->
+<div id="modalNuevaBeca" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">NUEVA BECA</h4>
+        <button style="background-color: red;" type="button" class="btn-close" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+
+      </div>
+      <div class="modal-body">
+        <div class="card" id="cardiframe">
+          <div class="row">
+            <div class="col-md">
+              <table class="table">
+                <thead style="background-color: #cfcfcf !important;">
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Monto</th>
+                    <th>Duración</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td> <input [(ngModel)]="Becca.tipo" class="form-control" type="text"></td>
+                    <td><input [(ngModel)]="Becca.monto" class="form-control" type="number"></td>
+                    <td><input [(ngModel)]="Becca.duracion" class="form-control" type="text"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="row pt-2 px-3">
+          <div class="col-md-10"></div>
+          <div class="col-md">
+            <button type="button"
+              style="font-size: 18px; ; margin-left: 2px; color: white ;border: none; border-left: 5px solid orange; width: 100%;"
+              class="btn btn-success" (click)="sendBeca()">
+              <i style="font-size: 18px;" class="fa fa-paper-plane"></i><strong>Enviar</strong></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PARA EDITAR ALUMNOS -->
+<div id="modalNuevoAlumno" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">NUEVO ALUMNO</h4>
+        <button style="background-color: red;" type="button" class="btn-close" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+
+      </div>
+      <div class="modal-body">
+        <div class="card" id="cardiframe">
+          <div class="row">
+            <div class="col-md">
+              <table class="table">
+                <thead style="background-color: #cfcfcf !important;">
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>No. Control</th>
+                    <th>Fecha Nacimiento</th>
+                    <th>Semestre</th>
+                    <th>Modalidad</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td> <input [(ngModel)]="Alummno.nombre" class="form-control" type="text"></td>
+                    <td><input [(ngModel)]="Alummno.apellidos" class="form-control" type="text"></td>
+                    <td><input [(ngModel)]="Alummno.noControl" class="form-control" type="text"></td>
+                    <td><input [(ngModel)]="Alummno.fech_nac" class="form-control" type="date"></td>
+                    <td><input [(ngModel)]="Alummno.semestre" class="form-control" type="number"></td>
+                    <td><input [(ngModel)]="Alummno.modalidad" class="form-control" type="text"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="row pt-2 px-3">
+          <div class="col-md-10"></div>
+          <div class="col-md">
+            <button type="button"
+              style="font-size: 18px; ; margin-left: 2px; color: white ;border: none; border-left: 5px solid orange; width: 100%;"
+              class="btn btn-success" (click)="sendAlumno()">
+              <i style="font-size: 18px;" class="fa fa-paper-plane"></i><strong>Enviar</strong></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL PARA EDITAR MATERIAS -->
+<div id="modalNuevaMateria" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">NUEVA MATERIA</h4>
+        <button style="background-color: red;" type="button" class="btn-close" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+
+      </div>
+      <div class="modal-body">
+        <div class="card" id="cardiframe">
+          <div class="row">
+            <div class="col-md">
+              <table class="table">
+                <thead style="background-color: #cfcfcf !important;">
+                  <tr>
+                    <th>Materia</th>
+                    <th>Docente</th>
+                    <th>Horario</th>
+                    <th>Semestre</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td> <input [(ngModel)]="Matteria.nombre" class="form-control" type="text"></td>
+                    <td><input [(ngModel)]="Matteria.responsable" class="form-control" type="text"></td>
+                    <td><input [(ngModel)]="Matteria.horario" class="form-control" type="text"></td>
+                    <td><input [(ngModel)]="Matteria.semestre" class="form-control" type="text"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="row pt-2 px-3">
+          <div class="col-md-10"></div>
+          <div class="col-md">
+            <button type="button"
+              style="font-size: 18px; ; margin-left: 2px; color: white ;border: none; border-left: 5px solid orange; width: 100%;"
+              class="btn btn-success" (click)="true" (click)="sendMateria()">
+              <i style="font-size: 18px;" class="fa fa-paper-plane"></i><strong>Enviar</strong></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PARA EDITAR REQUISITOS -->
+<div id="modalNuevoReqP" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">NUEVO REQUISTO</h4>
+        <button style="background-color: red;" type="button" class="btn-close" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+
+      </div>
+      <div class="modal-body">
+        <div class="card" id="cardiframe">
+          <div class="row">
+            <div class="col-md">
+              <table class="table">
+                <thead style="background-color: #cfcfcf !important;">
+                  <tr>
+                    <th>Requisito</th>
+                    <th>Descripción</th>
+                    <th>Fecha Revisión</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td> <input [(ngModel)]="Reqquisito.requisito" class="form-control" type="text"></td>
+                    <td><input [(ngModel)]="Reqquisito.descripcion" class="form-control" type="text"></td>
+                    <td><input [(ngModel)]="Reqquisito.fecha_revision" class="form-control" type="date"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="row pt-2 px-3">
+          <div class="col-md-10"></div>
+          <div class="col-md">
+            <button type="button"
+              style="font-size: 18px; ; margin-left: 2px; color: white ;border: none; border-left: 5px solid orange; width: 100%;"
+              class="btn btn-success" (click)="sendReqP()">
+              <i style="font-size: 18px;" class="fa fa-paper-plane"></i><strong>Enviar</strong></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL PARA EDITAR/ CREAR REQUISITOS BECAS -->
+<div id="modalNuevoRequisito" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">EDITAR REQUISITO</h4>
+        <button style="background-color: red;" type="button" class="btn-close" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+
+      </div>
+      <div class="modal-body">
+        <div class="card" id="cardiframe">
+          <div class="row">
+            <div class="col-md">
+              <table class="table">
+                <thead style="background-color: #cfcfcf !important;">
+                  <tr>
+                    <th>Requisito</th>
+                    <th>Docente</th>
+                    <th>Descripción</th>
+                    <th>Puntaje</th>
+                    <th>Fecha</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td> <input [(ngModel)]="Matteria.nombre" class="form-control" type="text"></td>
+                    <td><input [(ngModel)]="Matteria.responsable" class="form-control" type="text"></td>
+                    <td><input [(ngModel)]="Matteria.horario" class="form-control" type="text"></td>
+                    <td><input [(ngModel)]="Matteria.semestre" class="form-control" type="text"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="row pt-2 px-3">
+          <div class="col-md-10"></div>
+          <div class="col-md">
+            <button type="button"
+              style="font-size: 18px; ; margin-left: 2px; color: white ;border: none; border-left: 5px solid orange; width: 100%;"
+              class="btn btn-success" (click)="true" (click)="sendMateria()">
+              <i style="font-size: 18px;" class="fa fa-paper-plane"></i><strong>Enviar</strong></button>
+          </div>
         </div>
       </div>
     </div>
