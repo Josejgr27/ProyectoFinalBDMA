@@ -87,6 +87,17 @@ export class RegistrosService {
     params = params.append('id', id);
     return this.http.post(this.api + `/delete_requisito`, params);
   }
+
+  newBecaRequisito(obj): Observable<any> {
+    return this.http.post(this.api + `/new_becas_requisitos`, obj);
+  }
+
+
+  newEstMateria(obj): Observable<any> {
+    return this.http.post(this.api + `/new_estudiantes_materias`, obj);
+  }
+
+
 }
 
 

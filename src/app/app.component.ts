@@ -9,6 +9,8 @@ import { Materia } from './models/Materia';
 import { DatePipe } from '@angular/common';
 import { Requisto } from './models/Req';
 import { BecReq } from './models/BecReq';
+import { EstMat } from './models/EstMat';
+
 
 
 declare var $;
@@ -45,12 +47,29 @@ export class AppComponent {
   Alummno = new Alumno();
   Matteria = new Materia();
   Reqquisito = new Requisto();
+  /* relaciones */
   BeccReqq = new BecReq();
+  EsttMatt = new EstMat();
+
+  todayDate = new Date();
+
+  MateriaActiva = 0;
+  BecaActiva = 0;
+  EstudianteActivo = 0;
+
 
 
   constructor(private servProy: RegistrosService,
     private modalService: NgbModal
   ) { }
+
+  ngOnInit() {
+    console.log('entro0');
+    this.getAlumnos();
+    this.getBecas();
+    this.getMaterias();
+    this.getRequisitosP();
+  }
 
   clickNav(name) {
 
@@ -96,7 +115,13 @@ export class AppComponent {
     };
 
     this.servProy.GetRequisitos(var_busqueda).subscribe((resp: any) => {
-      this.lRequisitos = resp.response;
+      if (id2) {
+        this.BeccReqq = resp.response[0];
+        console.log('resp.', this.BeccReqq);
+
+      } else {
+        this.lRequisitos = resp.response;
+      }
     });
   }
 
@@ -110,14 +135,22 @@ export class AppComponent {
     });
   }
 
-  getCalificaciones(est, mat) {
+  getCalificaciones(est, mat, ida) {
     var var_busqueda = {
-      id_estudiante: est,
-      id_materia: mat,
+      id: ida || '',
+      id_estudiante: est || '',
+      id_materia: mat || '',
     };
 
+    if (est) {
+      this.EstudianteActivo = est;
+    }
     this.servProy.GetCalificaciones(var_busqueda).subscribe((resp: any) => {
-      this.lCalificaciones = resp.response;
+      if (ida) {
+        this.EsttMatt = resp.response[0];
+      } else {
+        this.lCalificaciones = resp.response;
+      }
     });
   }
 
@@ -140,11 +173,12 @@ export class AppComponent {
 
   clickVerRequisitosP(id) {
     this.getRequisitos(id, '');
+    this.BecaActiva = id;
     $("#modalReq").modal('show');
   }
 
   clickVerCalificaciones(est, mat) {
-    this.getCalificaciones(est, mat);
+    this.getCalificaciones(est, mat, '');
     $("#modalCalif").modal('show');
   }
 
@@ -154,7 +188,7 @@ export class AppComponent {
   }
 
   clickVerAlumnos(est, mat) {
-    this.getCalificaciones(est, mat);
+    this.getCalificaciones(est, mat, '');
     $("#modalAlum").modal('show');
   }
 
@@ -166,6 +200,8 @@ export class AppComponent {
 
   editBeca(beca) {
     this.Becca = { ...beca };
+    console.log('bec', this.Becca);
+
     $("#modalNuevaBeca").modal('show');
   }
 
@@ -559,11 +595,161 @@ export class AppComponent {
 
 
   clickVerReqBec(id) {
-    this.getRequisitos('', id);
-    //becreq
+    id && id != 0 ? this.getRequisitos('', id) : this.BeccReqq = new BecReq();;
+
 
     $("#modalNuevoRequisito").modal('show');
   }
+
+
+  enviarBecReq() {
+    if (!this.BeccReqq.puntaje) {
+      Swal.fire(
+        "Atencion",
+        `Favor de llenar todos los campos requeridos <i class="fa fa-asterisk" style="color:red"></i>`,
+        "warning"
+      );
+    } else {
+      Swal.fire({
+        title: "¡Atención!",
+        html: this.BeccReqq.id ? `¿Estás seguro de modificar este requisito?` : `¿Estás seguro de crear un nuevo requisito?`,
+        icon: "warning",
+        showCancelButton: true,
+        cancelButtonText: "No",
+        confirmButtonColor: "#0D6EFD",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí",
+      }).then((result) => {
+        if (result.value) {
+          console.log('thisBeca', this.BecaActiva);
+
+          console.log('respuesta a envar', this.BeccReqq);
+          this.BeccReqq.id_beca = this.BecaActiva;
+          this.servProy.newBecaRequisito(this.BeccReqq).subscribe((resp: any) => {
+            if (resp.status == 200) {
+              this.getRequisitos(this.BecaActiva, '');
+
+
+              $("#modalNuevoRequisito").modal('hide');
+
+              Swal.fire(
+                "Atencion",
+                `Su requisito ha sido registrada con exito`,
+                "success"
+              );
+              this.BeccReqq = new BecReq();
+            } else {
+              Swal.fire(
+                "Atencion",
+                `Algo salio mal al registrar la materia`,
+                "error"
+              );
+            }
+          });
+        }
+      });
+    }
+  }
+
+  selectBecReq(evento) {
+    const index = this.lRequisitos.findIndex(req => req.id_requisito === evento.id);
+
+    if (index == -1) {
+      this.BeccReqq.id_requisito = evento.id;
+      this.BeccReqq.name_desc = evento.descripcion;
+    } else {
+      this.BeccReqq = new BecReq();
+      Swal.fire(
+        "Atencion",
+        `El requisito seleccionado, ya esta en la beca`,
+        "error"
+      );
+    }
+  }
+
+
+
+
+  /* FUNCIONES ESTUDIANTES-MATERIAS */
+
+  clickVerEstMat(id) {
+    id && id != 0 ? this.getCalificaciones('', '', id) : this.EsttMatt = new EstMat();
+
+
+    $("#modalNuevoEstMat").modal('show');
+  }
+
+  selectEstMat(evento) {
+    const index = this.lCalificaciones.findIndex(req => req.id_materia === evento.id);
+
+    if (index === -1) {
+
+      this.EsttMatt.id_materia = evento.id;
+      this.EsttMatt.name_mat = evento.nombre;
+    } else {
+
+      this.EsttMatt.id_materia = null;
+      this.EsttMatt.calificacion = null;
+      this.EsttMatt.id_estudiante = null;
+      this.EsttMatt.id = null;
+      // this.EsttMatt = new EstMat();
+      console.log('this', this.EsttMatt);
+
+      Swal.fire(
+        "Atencion",
+        `La materia seleccionada, ya esta en el estudiante`,
+        "error"
+      );
+    }
+  }
+
+  enviarEstMat() {
+    if (!this.EsttMatt.calificacion) {
+      Swal.fire(
+        "Atencion",
+        `Favor de llenar todos los campos requeridos <i class="fa fa-asterisk" style="color:red"></i>`,
+        "warning"
+      );
+    } else {
+      Swal.fire({
+        title: "¡Atención!",
+        html: this.EsttMatt.id ? `¿Estás seguro de modificar esta calificación?` : `¿Estás seguro de crear una nueva calificación?`,
+        icon: "warning",
+        showCancelButton: true,
+        cancelButtonText: "No",
+        confirmButtonColor: "#0D6EFD",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí",
+      }).then((result) => {
+        if (result.value) {
+          this.EsttMatt.id_estudiante = this.EstudianteActivo;
+          console.log('estmatt', this.EsttMatt);
+          this.servProy.newEstMateria(this.EsttMatt).subscribe((resp: any) => {
+            if (resp.status == 200) {
+              this.getCalificaciones(resp.response.id_estudiante, '', '');
+
+
+              $("#modalNuevoEstMat").modal('hide');
+
+              Swal.fire(
+                "Atencion",
+                `Su calificación ha sido registrada con exito`,
+                "success"
+              );
+              this.EsttMatt = new EstMat();
+            } else {
+              Swal.fire(
+                "Atencion",
+                `Algo salio mal al registrar la materia`,
+                "error"
+              );
+            }
+          });
+        }
+      });
+    }
+  }
+
 
 }
 

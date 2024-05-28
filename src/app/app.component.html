@@ -192,7 +192,9 @@
               <table class="table">
                 <thead style="background-color: #cfcfcf !important;">
                   <tr>
-                    <th style="width: 50px;">#</th>
+                    <th style="width: 50px;"><i class="fa fa-plus cursor" aria-hidden="true"
+                        (click)="clickVerReqBec(0)"></i>
+                    </th>
                     <th>Requisito</th>
                     <th>Descripción</th>
                     <th>Puntaje Necesario</th>
@@ -288,7 +290,8 @@
               <table class="table">
                 <thead style="background-color: #cfcfcf !important;">
                   <tr>
-                    <th style="width: 50px;">#</th>
+                    <th style="width: 50px;"><i class="fa fa-plus cursor" aria-hidden="true"
+                        (click)="clickVerEstMat(0)"></i></th> <!--AQUI AQUI AQUI  -->
                     <th>Materia</th>
                     <th>Docente</th>
                     <th>Calificación</th>
@@ -303,7 +306,8 @@
                     <td>{{item?.materia?.responsable}}</td>
                     <td>{{item.calificacion || '-'}}</td>
                     <td>{{item?.estudiante?.modalidad}}</td>
-                    <td> <em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar" (click)="true"></em>
+                    <td> <em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar"
+                        (click)="clickVerEstMat(item.id)"></em>
                     </td>
                   </tr>
                 </tbody>
@@ -574,7 +578,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">EDITAR REQUISITO</h4>
+        <h4 class="modal-title">{{BeccReqq.id?'EDITAR':'NUEVO'}} REQUISITO</h4>
         <button style="background-color: red;" type="button" class="btn-close" data-bs-dismiss="modal"
           aria-label="Close"></button>
 
@@ -587,18 +591,26 @@
                 <thead style="background-color: #cfcfcf !important;">
                   <tr>
                     <th>Requisito</th>
-                    <th>Docente</th>
                     <th>Descripción</th>
                     <th>Puntaje</th>
-                    <th>Fecha</th>
+                    <th>Fecha de actualización</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td> <input [(ngModel)]="Matteria.nombre" class="form-control" type="text"></td>
-                    <td><input [(ngModel)]="Matteria.responsable" class="form-control" type="text"></td>
-                    <td><input [(ngModel)]="Matteria.horario" class="form-control" type="text"></td>
-                    <td><input [(ngModel)]="Matteria.semestre" class="form-control" type="text"></td>
+                  <tr *ngIf="BeccReqq.id">
+                    <td><label>{{BeccReqq.requisito.requisito}}</label> </td>
+                    <td><label>{{BeccReqq.requisito.descripcion}}</label></td>
+                    <td><input [(ngModel)]="BeccReqq.puntaje" class="form-control" type="number"></td>
+                    <td><label>{{BeccReqq.updated_at | date:'dd-MM-yyyy'}}</label></td>
+                  </tr>
+                  <tr *ngIf="!BeccReqq.id">
+                    <td> <ng-select [(ngModel)]="BeccReqq.id_requisito" [items]="lRequisitosP" bindLabel="requisito"
+                        (change)="selectBecReq($event)" bindValue="id" placeholder="Select option" class="flex-grow-1"
+                        [clearable]="false"></ng-select>
+                    </td>
+                    <td>{{BeccReqq.name_desc}}</td>
+                    <td><input [(ngModel)]="BeccReqq.puntaje" class="form-control" type="number"></td>
+                    <td><label>{{todayDate | date:'dd-MM-yyyy'}}</label></td>
                   </tr>
                 </tbody>
               </table>
@@ -610,7 +622,66 @@
           <div class="col-md">
             <button type="button"
               style="font-size: 18px; ; margin-left: 2px; color: white ;border: none; border-left: 5px solid orange; width: 100%;"
-              class="btn btn-success" (click)="true" (click)="sendMateria()">
+              class="btn btn-success" (click)="enviarBecReq()">
+              <i style="font-size: 18px;" class="fa fa-paper-plane"></i><strong>Enviar</strong></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- MODAL PARA EDITAR/ CREAR ALUMNOS MATERIAS -->
+<div id="modalNuevoEstMat" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">{{EsttMatt.id?'EDITAR':'NUEVA'}} CALIFICACIÓN</h4>
+        <button style="background-color: red;" type="button" class="btn-close" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+
+      </div>
+      <div class="modal-body">
+        <div class="card" id="cardiframe">
+          <div class="row">
+            <div class="col-md">
+              <table class="table">
+                <thead style="background-color: #cfcfcf !important;">
+                  <tr>
+                    <th>Materia</th>
+                    <th>Calificación</th>
+                    <th>Fecha de actualización</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngIf="EsttMatt.id">
+                    <td><label>{{EsttMatt.materia.nombre}}</label> </td>
+                    <td><input [(ngModel)]="EsttMatt.calificacion" class="form-control" type="number"></td>
+                    <td><label>{{EsttMatt.updated_at | date:'dd-MM-yyyy'}}</label></td>
+                  </tr>
+                  <tr *ngIf="!EsttMatt.id">
+                    <td> <ng-select [(ngModel)]="EsttMatt.id_materia" [items]="lMaterias" bindLabel="nombre"
+                        (change)="selectEstMat($event)" bindValue="id" placeholder="Select option" class="flex-grow-1"
+                        [clearable]="false"></ng-select>
+                    </td>
+                    <td><input [(ngModel)]="EsttMatt.calificacion" class="form-control" type="number"></td>
+                    <td><label>{{todayDate | date:'dd-MM-yyyy'}}</label></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="row pt-2 px-3">
+          <div class="col-md-10"></div>
+          <div class="col-md">
+            <button type="button"
+              style="font-size: 18px; ; margin-left: 2px; color: white ;border: none; border-left: 5px solid orange; width: 100%;"
+              class="btn btn-success" (click)="enviarEstMat()">
               <i style="font-size: 18px;" class="fa fa-paper-plane"></i><strong>Enviar</strong></button>
           </div>
         </div>
