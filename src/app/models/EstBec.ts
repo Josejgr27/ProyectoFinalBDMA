@@ -1,12 +1,13 @@
 
-export class EstMat {
+export class EstBec {
   id?: number;
+  id_beca?: number;
   id_estudiante?: number;
-  id_materia?: number;
-  calificacion?: string;
+  fecha_inicio?: string;
   created_at?: string;
   updated_at?: string;
-  materia?: any;
+  status?: number;
+  beca?: any;
 
   name_mat?: string;
 
@@ -15,8 +16,8 @@ export class EstMat {
   constructor() {
     this.id = null;
     this.id_estudiante = null;
-    this.id_materia = null;
-    this.calificacion = null;
+    this.id_beca = null;
+    this.fecha_inicio = null;
     this.name_mat = null;
   }
 }

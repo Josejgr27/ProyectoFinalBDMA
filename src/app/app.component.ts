@@ -10,6 +10,7 @@ import { DatePipe } from '@angular/common';
 import { Requisto } from './models/Req';
 import { BecReq } from './models/BecReq';
 import { EstMat } from './models/EstMat';
+import { EstBec } from './models/EstBec';
 
 
 
@@ -43,6 +44,12 @@ export class AppComponent {
   lCalificaciones = [];
   lBecasEst = [];
 
+  lStatus = [
+    { id: 1, name: 'ACTIVA' },
+    { id: 2, name: 'INACTIVA' },
+  ];
+
+
   Becca = new Beca();
   Alummno = new Alumno();
   Matteria = new Materia();
@@ -50,6 +57,7 @@ export class AppComponent {
   /* relaciones */
   BeccReqq = new BecReq();
   EsttMatt = new EstMat();
+  EsttBecc = new EstBec();
 
   todayDate = new Date();
 
@@ -64,7 +72,7 @@ export class AppComponent {
   ) { }
 
   ngOnInit() {
-    console.log('entro0');
+    //console.log('entro0');
     this.getAlumnos();
     this.getBecas();
     this.getMaterias();
@@ -117,7 +125,7 @@ export class AppComponent {
     this.servProy.GetRequisitos(var_busqueda).subscribe((resp: any) => {
       if (id2) {
         this.BeccReqq = resp.response[0];
-        console.log('resp.', this.BeccReqq);
+        //console.log('resp.', this.BeccReqq);
 
       } else {
         this.lRequisitos = resp.response;
@@ -129,7 +137,7 @@ export class AppComponent {
     var var_busqueda = {};
 
     this.servProy.GetRequisitosP(var_busqueda).subscribe((resp: any) => {
-      console.log('resp.', resp.response);
+      //console.log('resp.', resp.response);
 
       this.lRequisitosP = resp.response;
     });
@@ -141,10 +149,6 @@ export class AppComponent {
       id_estudiante: est || '',
       id_materia: mat || '',
     };
-
-    if (est) {
-      this.EstudianteActivo = est;
-    }
     this.servProy.GetCalificaciones(var_busqueda).subscribe((resp: any) => {
       if (ida) {
         this.EsttMatt = resp.response[0];
@@ -154,14 +158,22 @@ export class AppComponent {
     });
   }
 
-  getBecasEST(est, bec) {
+  getBecasEST(est, bec, id) {
     var var_busqueda = {
+      id: id,
       id_estudiante: est,
       id_beca: bec,
     };
 
     this.servProy.GetBecasEst(var_busqueda).subscribe((resp: any) => {
-      this.lBecasEst = resp.response;
+      if (id) {
+        this.EsttBecc = resp.response[0];
+
+      } else {
+        this.lBecasEst = resp.response;
+        console.log('est', this.lBecasEst);
+
+      }
     });
   }
 
@@ -178,12 +190,14 @@ export class AppComponent {
   }
 
   clickVerCalificaciones(est, mat) {
+    this.EstudianteActivo = est;
     this.getCalificaciones(est, mat, '');
     $("#modalCalif").modal('show');
   }
 
   clickVerBecas(est, bec) {
-    this.getBecasEST(est, bec);
+    this.EstudianteActivo = est;
+    this.getBecasEST(est, bec, '');
     $("#modalBecas").modal('show');
   }
 
@@ -200,7 +214,7 @@ export class AppComponent {
 
   editBeca(beca) {
     this.Becca = { ...beca };
-    console.log('bec', this.Becca);
+    //console.log('bec', this.Becca);
 
     $("#modalNuevaBeca").modal('show');
   }
@@ -621,9 +635,9 @@ export class AppComponent {
         confirmButtonText: "Sí",
       }).then((result) => {
         if (result.value) {
-          console.log('thisBeca', this.BecaActiva);
+          //console.log('thisBeca', this.BecaActiva);
 
-          console.log('respuesta a envar', this.BeccReqq);
+          //console.log('respuesta a envar', this.BeccReqq);
           this.BeccReqq.id_beca = this.BecaActiva;
           this.servProy.newBecaRequisito(this.BeccReqq).subscribe((resp: any) => {
             if (resp.status == 200) {
@@ -693,7 +707,7 @@ export class AppComponent {
       this.EsttMatt.id_estudiante = null;
       this.EsttMatt.id = null;
       // this.EsttMatt = new EstMat();
-      console.log('this', this.EsttMatt);
+      //console.log('this', this.EsttMatt);
 
       Swal.fire(
         "Atencion",
@@ -723,7 +737,7 @@ export class AppComponent {
       }).then((result) => {
         if (result.value) {
           this.EsttMatt.id_estudiante = this.EstudianteActivo;
-          console.log('estmatt', this.EsttMatt);
+          //console.log('estmatt', this.EsttMatt);
           this.servProy.newEstMateria(this.EsttMatt).subscribe((resp: any) => {
             if (resp.status == 200) {
               this.getCalificaciones(resp.response.id_estudiante, '', '');
@@ -747,6 +761,86 @@ export class AppComponent {
           });
         }
       });
+    }
+  }
+
+  /* FUNCIONES ESTUDIANTES-BECAS */
+
+  clickVerEstBec(id) {
+    id && id != 0 ? this.getBecasEST('', '', id) : this.EsttBecc = new EstBec();
+
+
+    $("#modalNuevoEstBec").modal('show');
+  }
+
+  enviarEstBec() {
+    if (!this.EsttBecc.status || !this.EsttBecc.id_beca || !this.EsttBecc.fecha_inicio) {
+      Swal.fire(
+        "Atencion",
+        `Favor de llenar todos los campos requeridos <i class="fa fa-asterisk" style="color:red"></i>`,
+        "warning"
+      );
+    } else {
+      Swal.fire({
+        title: "¡Atención!",
+        html: this.EsttBecc.id ? `¿Estás seguro de modificar esta beca?` : `¿Estás seguro de crear una esta beca?`,
+        icon: "warning",
+        showCancelButton: true,
+        cancelButtonText: "No",
+        confirmButtonColor: "#0D6EFD",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí",
+      }).then((result) => {
+        if (result.value) {
+          this.EsttBecc.id_estudiante = this.EstudianteActivo;
+          console.log('estmatt', this.EsttBecc);
+          this.servProy.newBecEstudiantes(this.EsttBecc).subscribe((resp: any) => {
+            if (resp.status == 200) {
+              this.getBecasEST(resp.response.id_estudiante, '', '');
+
+
+              $("#modalNuevoEstBec").modal('hide');
+
+              Swal.fire(
+                "Atencion",
+                `Su beca ha sido registrada con exito`,
+                "success"
+              );
+              this.EsttBecc = new EstBec();
+            } else {
+              Swal.fire(
+                "Atencion",
+                `Algo salio mal al registrar la beca`,
+                "error"
+              );
+            }
+          });
+        }
+      });
+    }
+  }
+
+  selectEstBec(evento) {
+    const index = this.lBecasEst.findIndex(req => req.id_beca === evento.id);
+
+    if (index === -1) {
+      this.EsttBecc.id_beca = evento.id;
+      this.EsttBecc.name_mat = evento.nombre;
+    } else {
+
+      this.EsttBecc.id_beca = null;
+      this.EsttBecc.fecha_inicio = null;
+      this.EsttBecc.id_estudiante = null;
+      this.EsttBecc.id = null;
+      this.EsttBecc.status = null;
+      // this.EsttMatt = new EstMat();
+      //console.log('this', this.EsttMatt);
+
+      Swal.fire(
+        "Atencion",
+        `La beca seleccionada, ya esta en el estudiante`,
+        "error"
+      );
     }
   }
 

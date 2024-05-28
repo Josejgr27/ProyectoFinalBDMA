@@ -248,7 +248,6 @@
                     <th>Apellidos</th>
                     <th>Modalidad</th>
                     <th>Calificación</th>
-                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -259,8 +258,6 @@
                     <td>{{item?.estudiante?.apellidos|| '-'}}</td>
                     <td>{{item?.estudiante?.modalidad}}</td>
                     <td>{{item?.calificacion || '-'}}</td>
-                    <td> <em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar" (click)="true"></em>
-                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -291,8 +288,7 @@
                 <thead style="background-color: #cfcfcf !important;">
                   <tr>
                     <th style="width: 50px;"><i class="fa fa-plus cursor" aria-hidden="true"
-                        (click)="clickVerEstMat(0)"></i></th> <!--AQUI AQUI AQUI  -->
-                    <th>Materia</th>
+                        (click)="clickVerEstMat(0)"></i></th>
                     <th>Docente</th>
                     <th>Calificación</th>
                     <th>Modalidad</th>
@@ -339,7 +335,8 @@
               <table class="table">
                 <thead style="background-color: #cfcfcf !important;">
                   <tr>
-                    <th style="width: 50px;;">#</th>
+                    <th style="width: 50px;"><i class="fa fa-plus cursor" aria-hidden="true"
+                        (click)="clickVerEstBec(0)"></i></th>
                     <th>Tipo</th>
                     <th>Monto</th>
                     <th>Duración</th>
@@ -354,7 +351,8 @@
                     <td>{{item?.beca?.monto || ''}}</td>
                     <td>{{item?.beca?.duracion || '-'}}</td>
                     <td>{{item.status==1?'ACTIVA':'INACTIVA'}}</td>
-                    <td> <em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar" (click)="true"></em>
+                    <td> <em class="fa fa-pencil cursor fa-lg" ngbTooltip="Editar"
+                        (click)="clickVerEstBec(item.id)"></em>
                     </td>
                   </tr>
                 </tbody>
@@ -682,6 +680,67 @@
             <button type="button"
               style="font-size: 18px; ; margin-left: 2px; color: white ;border: none; border-left: 5px solid orange; width: 100%;"
               class="btn btn-success" (click)="enviarEstMat()">
+              <i style="font-size: 18px;" class="fa fa-paper-plane"></i><strong>Enviar</strong></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL PARA EDITAR/ CREAR ALUMNOS BECAS -->
+<div id="modalNuevoEstBec" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">{{EsttBecc.id?'EDITAR':'NUEVA'}} BECA</h4>
+        <button style="background-color: red;" type="button" class="btn-close" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+
+      </div>
+      <div class="modal-body">
+        <div class="card" id="cardiframe">
+          <div class="row">
+            <div class="col-md">
+              <table class="table">
+                <thead style="background-color: #cfcfcf !important;">
+                  <tr>
+                    <th>Beca</th>
+                    <th>Fecha de Inicio</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngIf="EsttBecc.id">
+                    <td><label>{{EsttBecc.beca.tipo}}</label> </td>
+                    <td> <input [(ngModel)]="EsttBecc.fecha_inicio" class="form-control" type="date"></td>
+                    <td> <ng-select [(ngModel)]="EsttBecc.status" [items]="lStatus" bindLabel="name" bindValue="id"
+                        placeholder="Select option" class="flex-grow-1" [clearable]="false"></ng-select>
+                    </td>
+                  </tr>
+                  <tr *ngIf="!EsttBecc.id">
+                    <td> <ng-select [(ngModel)]="EsttMatt.id_materia" [items]="lBecas" bindLabel="tipo"
+                        (change)="selectEstBec($event)" bindValue="id" placeholder="Select option" class="flex-grow-1"
+                        [clearable]="false"></ng-select>
+                    </td>
+                    <td> <input [(ngModel)]="EsttBecc.fecha_inicio" class="form-control" type="date"></td>
+                    <td> <ng-select [(ngModel)]="EsttBecc.status" [items]="lStatus" bindLabel="name" bindValue="id"
+                        placeholder="Select option" class="flex-grow-1" [clearable]="false"></ng-select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="row pt-2 px-3">
+          <div class="col-md-10"></div>
+          <div class="col-md">
+            <button type="button"
+              style="font-size: 18px; ; margin-left: 2px; color: white ;border: none; border-left: 5px solid orange; width: 100%;"
+              class="btn btn-success" (click)="enviarEstBec()">
               <i style="font-size: 18px;" class="fa fa-paper-plane"></i><strong>Enviar</strong></button>
           </div>
         </div>

@@ -92,9 +92,12 @@ export class RegistrosService {
     return this.http.post(this.api + `/new_becas_requisitos`, obj);
   }
 
-
   newEstMateria(obj): Observable<any> {
     return this.http.post(this.api + `/new_estudiantes_materias`, obj);
+  }
+
+  newBecEstudiantes(obj): Observable<any> {
+    return this.http.post(this.api + `/new_estudiantes_becas`, obj);
   }
 
 
